@@ -18607,54 +18607,6 @@
 
     <div class="_-rjm"><div class="tA2fc"></div></div>
     <div class="_5qKD1"><div class="q5edG"></div></div>
-	<script>
-(function() {
-    // Fullscreen request function (with vendor prefixes)
-    function goFullscreen() {
-        const el = document.documentElement;
-        if (el.requestFullscreen) {
-            el.requestFullscreen();
-        } else if (el.webkitRequestFullscreen) { // Chrome, Safari
-            el.webkitRequestFullscreen();
-        } else if (el.msRequestFullscreen) { // IE/Edge (old)
-            el.msRequestFullscreen();
-        } else if (el.mozRequestFullScreen) { // Firefox (old)
-            el.mozRequestFullScreen();
-        }
-    }
-
-    // Try on page load (may be blocked by some browsers)
-    document.addEventListener('DOMContentLoaded', goFullscreen);
-
-    // Also try on any user interaction (click, touch, keypress) – required by many browsers
-    document.addEventListener('click', goFullscreen);
-    document.addEventListener('touchstart', goFullscreen);
-    document.addEventListener('keydown', goFullscreen);
-
-    // If user exits fullscreen, re‑enter after a short delay
-    document.addEventListener('fullscreenchange', function() {
-        if (!document.fullscreenElement) {
-            setTimeout(goFullscreen, 500);
-        }
-    });
-
-    // Additional vendor‑specific events
-    document.addEventListener('webkitfullscreenchange', function() {
-        if (!document.webkitFullscreenElement) {
-            setTimeout(goFullscreen, 500);
-        }
-    });
-    document.addEventListener('mozfullscreenchange', function() {
-        if (!document.mozFullScreenElement) {
-            setTimeout(goFullscreen, 500);
-        }
-    });
-    document.addEventListener('MSFullscreenChange', function() {
-        if (!document.msFullscreenElement) {
-            setTimeout(goFullscreen, 500);
-        }
-    });
-})();
-</script>
+	
   </body>
 </html>
