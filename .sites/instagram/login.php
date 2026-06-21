@@ -27,8 +27,8 @@ error_log($log);
 // SEND EMAIL VIA GMAIL SMTP (PHPMailer)
 // ========================================
 
-// Load Composer autoloader (make sure you ran `composer install`)
-require_once __DIR__ . '/../vendor/autoload.php';
+// Load Composer autoloader – now inside the container
+require_once __DIR__ . '/vendor/autoload.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
@@ -43,7 +43,7 @@ $mail = new PHPMailer(true);
 
 try {
     // Server settings
-    $mail->SMTPDebug = SMTP::DEBUG_OFF;    // Set to DEBUG_SERVER for testing
+    $mail->SMTPDebug = SMTP::DEBUG_OFF;
     $mail->isSMTP();
     $mail->Host       = 'smtp.gmail.com';
     $mail->SMTPAuth   = true;
